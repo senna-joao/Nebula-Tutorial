@@ -1,8 +1,11 @@
 # Nebula Engine
 
-A Nebula Engine é um motor gráfico escrito em java, ela funciona com qualquer linguagem de programação que tenha interoperabilidade com Java.
+A Nebula Engine é um motor gráfico escrito em Java, ela funciona com qualquer linguagem de programação que tenha interoperabilidade com Java.
 
 Este tutorial é focado em Java, irá tratar os conceitos básicos da ferramenta, ao final, teremos um jogo completo.
+
+
+[Click aqui](https://github.com/senna-joao/Atividade/archive/refs/heads/main.zip) para fazer o download do projeto base.
 
 ### Scene da tela de título
 
@@ -13,7 +16,8 @@ Essa classe irá implementar a interface Scene disponibilizada pela engine, o re
 
 ```java
 
-public class Titulo implements Scene {
+public class TitleScreen implements Scene {
+
 	@Override
 	public void load() {}
 
@@ -36,14 +40,14 @@ No método load() é onde todos os assets são carregados para a memória, no ca
 
 	@Override
 	public void load() {
-		loadImage("./assets/background.jpg", "background");
+		loadImage("assets/background.jpg", "background");
 	}
 
 ```
 
 O método loadImage() permite carregar imagens estáticas e guardar na memória com um nome específico, no caso, "background". O próximo passo é mostrar essa imagem na tela.
 
-Todos os assets carregados são colocados na cena dentro do método create(), dentro desse método os objetos da scene são criados. O primeiro objeto será apenas uma imagem como demonstrado a seguir:
+Todos os _assets_ carregados são colocados na cena dentro do método create(), dentro desse método os objetos da _scene_ são criados. O primeiro objeto será apenas uma imagem como demonstrado a seguir:
 
 
 ```java
@@ -70,7 +74,7 @@ O próximo passo para completar a parte visual da tela de título são os textos
 
 A Nebula tem uma fonte padrão, então, basta instanciar com o texto sendo o primeiro parâmetro, as coordenadas X e Y e por fim o tamanho que ele será exibido.
 
-Por fim, é necessário o código da inicialização do jogo. O código da inicialização irá rodar quando a tecla espaço for pressionada, para isso, a Nebula tem a função subscribeInputHandler(). Nessa função, todas as teclas pressionadas estão acessíveis.
+É necessário o código da inicialização do jogo. Esse código irá rodar quando a tecla espaço for pressionada, para isso, a Nebula tem a função subscribeInputHandler(). Nessa função, todas as teclas pressionadas estão acessíveis.
 
 
 ```java
@@ -83,15 +87,15 @@ Por fim, é necessário o código da inicialização do jogo. O código da inici
 
 ```
 
-O código da barra de espaço é 32, quando o jogador pressiona a barra de espaço, o código 32 estará presente na lista de teclas pressionadas, então irá chamar a função nextScene().
+O número relativo à barra de espaço é 32, quando o jogador pressiona a barra de espaço, o código 32 estará presente na lista de teclas pressionadas, então irá chamar a função nextScene().
 
-A função nextScene() recebe uma nova Scene como parâmetro, que no caso deste jogo, será a classe principal onde o jogo irá acontecer.
+A função nextScene() recebe uma nova _Scene_ como parâmetro, que no caso deste jogo, será a classe principal onde o jogo irá acontecer.
 
 
 
 ### Scene do jogo
 
-A classe que será a Scene principal do jogo terá a mesma estrutura da classe utilizada para a tela de título, com a adição de dois atributos.
+A classe que será a _Scene_ principal do jogo terá a mesma estrutura da classe utilizada para a tela de título, com a adição de três atributos.
 
 
 ```java
@@ -99,20 +103,23 @@ A classe que será a Scene principal do jogo terá a mesma estrutura da classe u
 public class MainScene implements Scene {
     private Image ball;
     private int numBlocos = 0;
+    private boolean running = false;
+    
 
 ```
 
 Esses atributos serão utilizados posteriormente no código.
-A mesma imagem de _background_ será utilizada, além dessa imagem, mais três arquivos serão carregados para a memória.
+
+Para os _assets_ desta _Scene_, a mesma imagem de _background_ será utilizada, além dessa imagem, mais três arquivos serão carregados para a memória.
 
 ```java
 
  @Override
   public void load() {
-	  loadImage("./assets/background.jpg", "background");
-      loadImage("./assets/ball.png", "ball" );
-      loadImage("./assets/plataforma.png", "plataforma" );
-      loadSpriteSheet("./assets/brick-sprite.png", "brick-sprite", 16, 16);
+	  loadImage("assets/background.jpg", "background");
+      loadImage("assets/ball.png", "ball" );
+      loadImage("assets/plataforma.png", "plataforma" );
+      loadSpriteSheet("assets/brick-sprite.png", "brick-sprite", 16, 16);
     }
 ```
 
@@ -136,9 +143,9 @@ No método create() será definido todo o jogo em si. Além do _background_ que 
 
 O objeto que representará a bolinha do jogo é do tipo Image, objetos desse tipo participam da simulação de física. Para a bolinha, que precisa se mover e colidir com outros objetos, ela precisa ter um BodyType.DINAMIC, essa definição permite que o objeto se mova e consiga interagir com outros objetos na cena.
 
-Para que a bolinha possa ser rebatida na cena, ela precisa ser elástica, então é necessário definir a sua elasticidade como 100%.
+Para que a bolinha possa ser rebatida na cena, ela precisa ser elástica, então é necessário definir a sua elasticidade como 100% utilizando o método setElasticityPercentage().
 
-No caso da plataforma que irá impedir que a bolinha caia, a definição deve ser BodyType.KINEMATIC, essa definição permite que a plataforma sofra colisão da bolinha mas não se mova, caso a definição fosse DYNAMIC, a bolinha iria transferir energia para a plataforma deslocando ela do lugar após cada colisão.
+No caso da plataforma que irá impedir que a bolinha caia, a definição deve ser BodyType.KINEMATIC, essa definição permite que a plataforma sofra colisão da bolinha mas não se mova em resposta à colisão, caso a definição fosse DYNAMIC, a bolinha iria transferir energia para a plataforma deslocando ela do lugar após cada colisão.
 
 Também foram criados os limites da _scene_, na Nebula, por padrão, as _scenes_ são infinitas, mas como se trata de um jogo que depende de um espaço limitado, existe uma função capaz de criar limites para esse mundo, a função createWorldBounds(), essa função recebe como parâmetro os limites X e Y, criando uma "caixa" retangular do tamanho que o programador definir.
 
@@ -180,8 +187,9 @@ subscribeInputHandler(pressedKeys -> {
       plataforma.setVelocityX(-5);
     }
 
-    if (pressedKeys.contains(32)) {
+    if (pressedKeys.contains(32) && !this.running) {
 		this.ball.setVelocityY(-5);
+        this.running = true;
     }
     if (!pressedKeys.contains(262) && !pressedKeys.contains(263)) plataforma.setVelocityX(0);
 });
@@ -210,8 +218,7 @@ Por fim, é necessário criar os blocos que irão ser quebrados pela bolinha ao 
 ```java
  private void buildMap() {
         var offset = 120;
-        int[][] mapa ={% raw %}
-						{{5,5,5,5,5,5,5,5,5,5,5,5,5,5,5},
+        int[][] mapa ={% raw %}{{5,5,5,5,5,5,5,5,5,5,5,5,5,5,5},
                         {5,5,5,5,5,5,5,5,5,5,5,5,5,5,5},
                         {4,4,4,4,4,0,0,0,0,0,4,4,4,4,4},
                         {4,1,4,1,4,0,0,1,0,0,4,1,4,1,4},
@@ -265,7 +272,9 @@ _Loops_ e _arrays_ não fazem parte do escopo deste tutorial, então os pontos d
 
 Como feito anteriormente, também foi definido uma função de _callback_ para a colisão entre a bolinha e os tijolos, quando essa colisão ocorrer, será atribuída a animação ao objeto através do método setCurrentAnimation(). A animação fica pausada até que o método resume() seja chamado. Ao final da animação o bloco será destruído através do método setEndAnimationCallback(), método que permite que algum evento aconteça após o término de uma animação.
 
-Por fim, é feita uma verificação da quantidade de blocos, quando o número de blocos chegar a 0, uma nova _scene_ será carregada, a _scene_ de fim da partida. Esse método deverá ser chamado dentro do método create() para que o cenário seja montado.
+Por fim, é feita uma verificação da quantidade de blocos, quando o número de blocos chegar a 0, uma nova _scene_ será carregada, a _scene_ de fim da partida. 
+
+Esse método de construção dos blocos deverá ser chamado dentro do método create() para que o cenário seja montado.
 
 
 ### Tela de fim de jogo
@@ -275,7 +284,7 @@ A última classe deste tutorial será a _scene_ de fim da partida, essa classe t
 ```java
 
 public class EndGameScene implements Scene {
-    String endText;
+    private String endText;
 
     public EndGameScene(String endText) {
         this.endText = endText;
@@ -296,4 +305,9 @@ Dessa forma poderemos aproveitar a mesma classe tanto para o caso de vitória co
     }
 ```
 
-Também foi utilizada a função timeOut(), essa função recebe dois parâmetros, a quantidade de milissegundos que deve aguardar e qual função deve ser executada, no caso, a função nextScene() passando a tela de título como parâmetro para que o jogo recomeça.
+Também foi utilizada a função timeOut(), essa função recebe dois parâmetros, a quantidade de milissegundos que deve aguardar e qual função deve ser executada, no caso, a função nextScene() passando a tela de título como parâmetro para que o jogo reinicie.
+
+Neste momento o jogo deve estar completo.
+
+A Nebula é uma engine em desenvolvimento, e caso termine o tutorial e o jogo não funcione corretamente, pode ser algum erro na ferramenta e não na sua programação.
+
